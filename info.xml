@@ -16,10 +16,9 @@
 	  <url desc="Licensing">http://www.gnu.org/licenses/agpl-3.0.html</url>
   </urls>
   <releaseDate>2015-05-18</releaseDate>
-  <version>0.1</version>
-  <develStage>alpha</develStage>
+  <version>0.1-alpha1</version>
   <compatibility>
-    <ver>4.2</ver>
+    <ver>4.6</ver>
   </compatibility>
   <comments>
 	  This extension will work once CRM-16036 gets fixed.
