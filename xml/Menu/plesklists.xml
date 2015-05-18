@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<menu>
+  <item>
+    <path>civicrm/plesklists/settings</path>
+    <page_callback>CRM_Plesklists_Form_PleskSettings</page_callback>
+    <title>Plesk Settings</title>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
+</menu>
