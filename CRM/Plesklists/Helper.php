@@ -10,6 +10,7 @@ class CRM_Plesklists_Helper {
    * @return array
    *
    * The result is an array, mapping ID's of CiviCRM groups to plesk list names.
+   * List names with an invalid format are ignored.
    */
   public static function getLists() {
     $custom_field_id = CRM_Core_BAO_Setting::getItem('plesklists', 'custom_field_id');
@@ -19,17 +20,33 @@ class CRM_Plesklists_Helper {
       "custom_$custom_field_id" => array('IS NOT NULL' => 1),
     ));
 
-    // This will only work if CRM-16036 is fixed. A patch exists, but it has
-    // some security issues:
-    // https://github.com/civicrm/civicrm-core/compare/master...johanv:CRM-16036-api_search_custom_fields_3rd_attempt
+    // As long as CRM-16036 is not fixed, the API call above will return all
+    // CiviCRM groups, even those where the custom field is not set.
+    // But the 'isValidListName' check below will ignore empty strings
+    // anyway, so this is not really a problem.
 
     $result = array();
 
     foreach ($api_result['values'] as $val) {
-      $result[$val['id']] = $val["custom_$custom_field_id"];
+      if (CRM_Plesklists_Helper::isValidListName($val["custom_$custom_field_id"])) {
+        $result[$val['id']] = $val["custom_$custom_field_id"];
+      }
     }
 
     return $result;
+  }
+
+  /**
+   * Checks whether $name is a valid list name.
+   *
+   * @param string $name
+   * @return bool
+   */
+  public static function isValidListName($name) {
+    // Just guessing the format of a mailman list name.
+    $pattern='/^[A-Za-z0-9._%+-]+$/';
+
+    return preg_match($pattern, $name);
   }
 
   /**
@@ -109,7 +126,7 @@ EOF;
     $client->setCredentials($login, $password);
 
     // create the request using clumsy text manipluation :-$
-    
+
     $request = "
       <packet>
         <maillist>\n";
@@ -150,7 +167,6 @@ EOF;
     $client->setCredentials($login, $password);
 
     // create the request using clumsy text manipluation :-$
-    
     $request = "
       <packet>
         <maillist>\n";

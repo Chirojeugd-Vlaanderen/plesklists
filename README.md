@@ -9,16 +9,6 @@ in sync with CiviCRM group members. It should work for both
 The extension only synchronizes e-mail adresses of contacts that don't
 have `is_opt_out` set.
 
-## You need to patch CiviCRM
-
-This extension won't work until
-[CRM-16036](https://issues.civicrm.org/jira/browse/CRM-16036)
-is fixed. At the time of this writing, it is still open.
-
-If you want to, you can patch CiviCRM with
-[pull request #5350](https://github.com/civicrm/civicrm-core/pull/5350)
-but this patch has some security issues.
-
 ## Configuration
 
 After enabling the extension, you can configure it via the form on
@@ -39,9 +29,10 @@ a mailing list in that custom field.
 Invoking the `sync` action of the `plesklists` API replaces all e-mail
 addresses of all plesk mailing lists that have a corresponding group in
 CiviCRM by the e-mail addresses of the contacts in the group. (Excluding
-the contacts that have `is_opt_out` set):
+the contacts that have `is_opt_out` set). If you use drush, you might
+need the -u 1 option.
 
-    drush cvapi Plesklists.sync
+    drush -u 1 cvapi Plesklists.sync
 
 You could create a scheduled task that performs this action on a regular base.
 
