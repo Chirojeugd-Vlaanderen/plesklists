@@ -89,6 +89,9 @@ class CRM_Plesklists_Helper {
     $client = new CRM_Plesklists_Client($host);
     $client->setCredentials($login, $password);
 
+    // Normally the format of $list_name has been checked before.
+    // But to be sure, we'll send it through htmlspecialchars.
+    $list_name = htmlspecialchars($list_name);
 
     $request = <<<EOF
 <packet>
@@ -125,14 +128,18 @@ EOF;
     $client = new CRM_Plesklists_Client($host);
     $client->setCredentials($login, $password);
 
-    // create the request using clumsy text manipluation :-$
+    // prevent script injection:
+    $list_name = htmlspecialchars($list_name);
 
+    // create the request using clumsy text manipluation :-$
     $request = "
       <packet>
         <maillist>\n";
 
-    // TODO: sanitize $list_name
     foreach ($emails as $email) {
+      // prevent script injection:
+      $email = htmlspecialchars($email);
+
       $request .= "
         <add-member>
           <filter>
@@ -166,13 +173,18 @@ EOF;
     $client = new CRM_Plesklists_Client($host);
     $client->setCredentials($login, $password);
 
+    // prevent script injection:
+    $list_name = htmlspecialchars($list_name);
+
     // create the request using clumsy text manipluation :-$
     $request = "
       <packet>
         <maillist>\n";
 
-    // TODO: sanitize $list_name
     foreach ($emails as $email) {
+      // prevent script injection:
+      $email = htmlspecialchars($email);
+
       $request .= "
         <del-member>
           <filter>
@@ -191,6 +203,5 @@ EOF;
     $data = new SimpleXMLElement($response);
     // TODO: error handling
   }
-
 
 }

@@ -147,6 +147,21 @@ function plesklists_civicrm_alterSettingsFolders(&$metaDataFolders = NULL) {
 }
 
 /**
+ * Implements hook_civicrm_validateForm().
+ */
+function plesklists_civicrm_validateForm($formName, &$fields, &$files, &$form, &$errors) {
+  if ($formName == 'CRM_Group_Form_Edit') {
+    $custom_field_id = CRM_Core_BAO_Setting::getItem('plesklists', 'custom_field_id');
+    $custom_field_name = "custom_${custom_field_id}_1";
+    // I am still not sure why the _1 suffix is needed.
+    $list_name = $fields[$custom_field_name];
+    if (isset($list_name) && trim($list_name) !== '' && !CRM_Plesklists_Helper::isValidListName($list_name)) {
+      $errors[$custom_field_name] = ts('Invalid mailing list name.');
+    }
+  }
+}
+
+/**
  * Functions below this ship commented out. Uncomment as required.
  *
 
