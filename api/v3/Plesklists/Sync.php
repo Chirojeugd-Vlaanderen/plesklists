@@ -10,7 +10,7 @@
  * @throws API_Exception
  */
 function civicrm_api3_plesklists_sync($params) {
-  $all_lists = CRM_Plesklists_Helper::getLists();
+  $all_lists = CRM_Plesklists_Helper::getListGroups();
 
   foreach ($all_lists as $group_id => $list_name) {
     $list_members = CRM_Plesklists_Helper::getListEmails($list_name);

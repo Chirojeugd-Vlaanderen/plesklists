@@ -5,14 +5,15 @@
  */
 class CRM_Plesklists_Helper {
   /**
-   * Returns all plesk lists.
+   * Returns an array with an element for each CiviCRM group connected to
+   * a plesk mailing list.
    *
    * @return array
    *
    * The result is an array, mapping ID's of CiviCRM groups to plesk list names.
    * List names with an invalid format are ignored.
    */
-  public static function getLists() {
+  public static function getListGroups() {
     $custom_field_id = CRM_Core_BAO_Setting::getItem('plesklists', 'custom_field_id');
     $api_result = civicrm_api3('Group', 'get', array(
       'sequential' => 1,
@@ -34,6 +35,24 @@ class CRM_Plesklists_Helper {
     }
 
     return $result;
+  }
+
+  /**
+   * Calls the plesk api.
+   * 
+   * @param string $request xml-request to send to the api.
+   * @returns the API result as string.
+   */
+  public static function pleskApi($request) {
+    $host = CRM_Core_BAO_Setting::getItem('plesklists', 'plesklist_host');
+    $login = CRM_Core_BAO_Setting::getItem('plesklists', 'plesklist_login');
+    $password = CRM_Core_BAO_Setting::getItem('plesklists', 'plesklist_password');
+
+    $client = new CRM_Plesklists_Client($host);
+    $client->setCredentials($login, $password);
+
+    // TODO: Error handling.
+    return $client->request($request);
   }
 
   /**
@@ -82,32 +101,23 @@ class CRM_Plesklists_Helper {
    * @return array
    */
   public static function getListEmails($list_name) {
-    $host = CRM_Core_BAO_Setting::getItem('plesklists', 'plesklist_host');
-    $login = CRM_Core_BAO_Setting::getItem('plesklists', 'plesklist_login');
-    $password = CRM_Core_BAO_Setting::getItem('plesklists', 'plesklist_password');
-
-    $client = new CRM_Plesklists_Client($host);
-    $client->setCredentials($login, $password);
-
     // Normally the format of $list_name has been checked before.
     // But to be sure, we'll send it through htmlspecialchars.
-    $list_name = htmlspecialchars($list_name);
+    $clean_list_name = htmlspecialchars($list_name);
 
     $request = <<<EOF
 <packet>
   <maillist>
     <get-members>
       <filter>
-        <list-name>$list_name</list-name>
+        <list-name>$clean_list_name</list-name>
       </filter>
     </get-members>
   </maillist>
 </packet>
 EOF;
 
-    $response = $client->request($request);
-
-    // TODO: error handling
+    $response = CRM_Plesklists_Helper::pleskApi($request);
 
     $data = new SimpleXMLElement($response);
     $result = (array)($data->maillist->{'get-members'}->result->id);
@@ -121,15 +131,8 @@ EOF;
    * @param array $emails
    */
   public static function addListEmails($list_name,$emails) {
-    $host = CRM_Core_BAO_Setting::getItem('plesklists', 'plesklist_host');
-    $login = CRM_Core_BAO_Setting::getItem('plesklists', 'plesklist_login');
-    $password = CRM_Core_BAO_Setting::getItem('plesklists', 'plesklist_password');
-
-    $client = new CRM_Plesklists_Client($host);
-    $client->setCredentials($login, $password);
-
     // prevent script injection:
-    $list_name = htmlspecialchars($list_name);
+    $clean_list_name = htmlspecialchars($list_name);
 
     // create the request using clumsy text manipluation :-$
     $request = "
@@ -143,7 +146,7 @@ EOF;
       $request .= "
         <add-member>
           <filter>
-            <list-name>$list_name</list-name>
+            <list-name>$clean_list_name</list-name>
           </filter>
           <id>$email</id>
         </add-member>\n";
@@ -153,10 +156,7 @@ EOF;
         </maillist>
       </packet>\n";
 
-    $response = $client->request($request);
-
-    $data = new SimpleXMLElement($response);
-    // TODO: error handling
+    CRM_Plesklists_Helper::pleskApi($request);
   }
 
   /**
@@ -166,15 +166,8 @@ EOF;
    * @param array $emails
    */
   public static function removeListEmails($list_name,$emails) {
-    $host = CRM_Core_BAO_Setting::getItem('plesklists', 'plesklist_host');
-    $login = CRM_Core_BAO_Setting::getItem('plesklists', 'plesklist_login');
-    $password = CRM_Core_BAO_Setting::getItem('plesklists', 'plesklist_password');
-
-    $client = new CRM_Plesklists_Client($host);
-    $client->setCredentials($login, $password);
-
     // prevent script injection:
-    $list_name = htmlspecialchars($list_name);
+    $clean_list_name = htmlspecialchars($list_name);
 
     // create the request using clumsy text manipluation :-$
     $request = "
@@ -188,7 +181,7 @@ EOF;
       $request .= "
         <del-member>
           <filter>
-            <list-name>$list_name</list-name>
+            <list-name>$clean_list_name</list-name>
           </filter>
           <id>$email</id>
         </del-member>\n";
@@ -198,10 +191,7 @@ EOF;
         </maillist>
       </packet>\n";
 
-    $response = $client->request($request);
-
-    $data = new SimpleXMLElement($response);
-    // TODO: error handling
+    CRM_Plesklists_Helper::pleskApi($request);
   }
 
 }
