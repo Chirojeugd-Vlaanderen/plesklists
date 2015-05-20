@@ -96,6 +96,51 @@ EOF;
     return $result;
   }
 
+  /**
+   * Applies filters from API $params to the collection of $lists.
+   *
+   * @param array $lists
+   *    Lists as returned by our custom API.
+   * @param array $params
+   *    Params from the API request.
+   *
+   * @return array
+   *    The result of applying the filters in $params to $lists.
+   *
+   * Only a very limited subset of the default API filters is supported ATM.
+   */
+  public static function filterLists($lists, $params) {
+    $list_keys = array(
+      "id" => 1,
+      "name" => 1,
+      "group_id" => 1,
+    );
+    $filters = array_intersect_key($params, $list_keys);
+
+    $result = array();
+    if (count($filters) > 0) {
+      foreach ($lists as $list) {
+        $ok = TRUE;
+        foreach ($filters as $key => $value) {
+          // At the moment we only support filters of the form
+          // KEY = VALUE.
+          // TODO: implement other operations
+          if ($list[$key] != $value) {
+            $ok = FALSE;
+          }
+        }
+        if ($ok) {
+          $result[] = $list;
+        }
+      }
+    }
+    else {
+      $result = $lists;
+    }
+
+    return $result;
+  }
+
 
   /**
    * Checks whether $name is a valid list name.

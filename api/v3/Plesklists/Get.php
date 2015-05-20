@@ -14,6 +14,7 @@
  */
 function civicrm_api3_plesklists_Get($params) {
   $all_lists = CRM_Plesklists_Helper::getLists();
-  return civicrm_api3_create_success($all_lists, $params, 'Plesklists', 'get');
+  $result = CRM_Plesklists_Helper::filterLists($all_lists, $params);
+  return civicrm_api3_create_success($result, $params, 'Plesklists', 'get');
 }
 
