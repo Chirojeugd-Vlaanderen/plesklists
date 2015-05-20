@@ -151,14 +151,65 @@ function plesklists_civicrm_alterSettingsFolders(&$metaDataFolders = NULL) {
  */
 function plesklists_civicrm_validateForm($formName, &$fields, &$files, &$form, &$errors) {
   if ($formName == 'CRM_Group_Form_Edit') {
-    $custom_field_id = CRM_Core_BAO_Setting::getItem('plesklists', 'custom_field_id');
-    $custom_field_name = "custom_${custom_field_id}_1";
-    // I am still not sure why the _1 suffix is needed.
+    $custom_field_name = _plesklists_civicrm_pleskListFormInfo($fields);
     $list_name = $fields[$custom_field_name];
-    if (isset($list_name) && trim($list_name) !== '' && !CRM_Plesklists_Helper::isValidListName($list_name)) {
-      $errors[$custom_field_name] = ts('Invalid mailing list name.');
+    $error = _plesklists_civicrm_validateListName(
+        $list_name,
+        $form->_entityId);
+
+    if (isset($error)) {
+      $errors[$custom_field_name] = $error;
     }
   }
+}
+
+/**
+ * Check if $list_name can be used as Plesk list for CiviCRM group $group_id.
+ *
+ * @param string $list_name
+ * @param string $group_id
+ * @return string
+ *    NULL if everything OK, otherwise a translated error message.
+ */
+function _plesklists_civicrm_validateListName($list_name, $group_id) {
+    if (!isset($list_name) || trim($list_name) === '') {
+      // empty name is always OK.
+      return NULL;
+    }
+
+    if (!CRM_Plesklists_Helper::isValidListName($list_name)) {
+      return ts('Invalid mailing list name.');
+    }
+
+    $result = civicrm_api3('Plesklists', 'get', array('name' => $list_name));
+    if ($result['count'] == 0) {
+      return ts(
+          'List %1 does not exist on Plesk server.', array(1 => $list_name));
+    }
+
+    $existing_group_id = $result["values"][0]["group_id"];
+    if (!empty($existing_group_id) && $existing_group_id != $group_id) {
+      return ts(
+          'Plesk mailing list %1 is already linked to group %2',
+          array(1 => $list_name, 2 => $result["values"][0]["group_id"]));
+    }
+
+    return NULL;
+}
+
+/**
+ * Find the field name containing the plesk list from the group form $fields.
+ *
+ * @param type $fields
+ * @return string
+ */
+function _plesklists_civicrm_pleskListFormInfo($fields) {
+    $custom_field_id = CRM_Core_BAO_Setting::getItem('plesklists', 'custom_field_id');
+    // I am not sure how to know the name of the form field. I guess it is
+    // the only one of which the name starts with custom_{$custom_field_id}.
+    $custom_field_name = CRM_Utils_Array::first(
+        preg_grep("/^custom_$custom_field_id/", array_keys($fields)));
+    return $custom_field_name;
 }
 
 /**
