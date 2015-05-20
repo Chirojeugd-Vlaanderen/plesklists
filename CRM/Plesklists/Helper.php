@@ -61,9 +61,7 @@ class CRM_Plesklists_Helper {
    */
   public static function getLists() {
     $host = CRM_Core_BAO_Setting::getItem('plesklists', 'plesklist_host');
-    $list_groups = array_flip(CRM_Plesklists_Helper::getListGroups());
 
-    $result = array();
     $request = <<<EOF
 <packet>
   <maillist>
@@ -77,6 +75,21 @@ class CRM_Plesklists_Helper {
 EOF;
 
     $response = CRM_Plesklists_Helper::pleskApi($request);
+    return CRM_Plesklists_Helper::handleGetListResponse($response);
+  }
+  
+  /**
+   * Handles the response of a get-list action on the Plesk API.
+   * 
+   * @param type $response
+   * 
+   * @return array
+   *    an array containing the plesk list entities that our
+   *    custom API returns.
+   */
+  private static function handleGetListResponse($response) {
+    $result = array();
+    $list_groups = array_flip(CRM_Plesklists_Helper::getListGroups());
 
     // I suspect that there are better ways to parse the response...
     $data = new SimpleXMLElement($response);
@@ -92,7 +105,6 @@ EOF;
       }
       $result[] = $list_array;
     }
-
     return $result;
   }
 
@@ -118,24 +130,19 @@ EOF;
     $filters = array_intersect_key($params, $list_keys);
 
     $result = array();
-    if (count($filters) > 0) {
-      foreach ($lists as $list) {
-        $ok = TRUE;
-        foreach ($filters as $key => $value) {
-          // At the moment we only support filters of the form
-          // KEY = VALUE.
-          // TODO: implement other operations
-          if ($list[$key] != $value) {
-            $ok = FALSE;
-          }
-        }
-        if ($ok) {
-          $result[] = $list;
+    foreach ($lists as $list) {
+      $ok = TRUE;
+      foreach ($filters as $key => $value) {
+        // At the moment we only support filters of the form
+        // KEY = VALUE.
+        // TODO: implement other operations
+        if ($list[$key] != $value) {
+          $ok = FALSE;
         }
       }
-    }
-    else {
-      $result = $lists;
+      if ($ok) {
+        $result[] = $list;
+      }
     }
 
     return $result;
