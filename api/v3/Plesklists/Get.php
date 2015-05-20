@@ -13,16 +13,7 @@
  * @throws API_Exception
  */
 function civicrm_api3_plesklists_Get($params) {
-  $all_lists = CRM_Plesklists_Helper::getListGroups();
-  $returnValues = array();
-
-  foreach ($all_lists as $group_id => $list_name) {
-    $returnValues[$group_id] = array (
-      'id' => $group_id,
-      'plesk_list' => $list_name,
-    );
-  }
-
-  return civicrm_api3_create_success($returnValues, $params, 'Plesklists', 'get');
+  $all_lists = CRM_Plesklists_Helper::getLists();
+  return civicrm_api3_create_success($all_lists, $params, 'Plesklists', 'get');
 }
 

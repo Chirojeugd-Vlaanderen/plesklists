@@ -39,7 +39,7 @@ class CRM_Plesklists_Helper {
 
   /**
    * Calls the plesk api.
-   * 
+   *
    * @param string $request xml-request to send to the api.
    * @returns the API result as string.
    */
@@ -54,6 +54,48 @@ class CRM_Plesklists_Helper {
     // TODO: Error handling.
     return $client->request($request);
   }
+
+  /**
+   * Returns an array containing all lists on the plesk server, with their
+   * corresponding CiviCRM Group ID (if any).
+   */
+  public static function getLists() {
+    $host = CRM_Core_BAO_Setting::getItem('plesklists', 'plesklist_host');
+    $list_groups = array_flip(CRM_Plesklists_Helper::getListGroups());
+
+    $result = array();
+    $request = <<<EOF
+<packet>
+  <maillist>
+    <get-list>
+      <filter>
+        <site-name>$host</site-name>
+      </filter>
+    </get-list>
+  </maillist>
+</packet>
+EOF;
+
+    $response = CRM_Plesklists_Helper::pleskApi($request);
+
+    // I suspect that there are better ways to parse the response...
+    $data = new SimpleXMLElement($response);
+    $plesk_result = (array)($data->maillist->{'get-list'});
+
+    foreach ($plesk_result["result"] as $list_object) {
+      $id = CRM_Utils_Array::first((array)($list_object->id));
+      $name = CRM_Utils_Array::first((array)($list_object->name));
+      $list_array = array("id" => $id, "name" => $name);
+
+      if (isset($list_groups[$name])) {
+        $list_array["group_id"] = $list_groups[$name];
+      }
+      $result[] = $list_array;
+    }
+
+    return $result;
+  }
+
 
   /**
    * Checks whether $name is a valid list name.
@@ -121,7 +163,7 @@ EOF;
 
     $data = new SimpleXMLElement($response);
     $result = (array)($data->maillist->{'get-members'}->result->id);
-    return($result);
+    return $result;
   }
 
   /**
