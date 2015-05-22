@@ -2,7 +2,7 @@
 
 /**
  * Helper methods for the plesklists extension.
- * 
+ *
  * TODO: This class needs some refactoring.
  */
 class CRM_Plesklists_Helper {
@@ -79,15 +79,15 @@ EOF;
     $response = CRM_Plesklists_Helper::pleskApi($request);
     return CRM_Plesklists_Helper::handleGetListResponse($response);
   }
-  
+
   /**
    * Creates a new mailing list with a given $name.
-   * 
+   *
    * @param string $name
    *    list name.
    * @param string $admin_email
    *    email address of list admin.
-   * @param string $password 
+   * @param string $password
    *    password for list admin. The password cannot use special characters,
    *    because I don't know how to escape them for the API call.
    * @return int
@@ -116,10 +116,32 @@ EOF;
     $data = new SimpleXMLElement($response);
     return CRM_Utils_Array::first((array)($data->maillist->{'add-list'}->result->id));
   }
-  
+
+  /**
+   * Deletes the mailing list with the given $name.
+   *
+   * @param string $name
+   *    list name.
+   */
+  public static function deleteList($name) {
+    $clean_name = htmlspecialchars($name);
+    $request = <<<EOF
+<packet>
+  <maillist>
+    <del-list>
+      <filter>
+        <name>$clean_name</name>
+      </filter>
+    </del-list>
+  </maillist>
+</packet>
+EOF;
+    CRM_Plesklists_Helper::pleskApi($request);
+  }
+
   /**
    * Returns the site-ID of the plesk site with given $site_name.
-   * @param string $site_name 
+   * @param string $site_name
    *    Plesk site name.
    * @return int
    *    Site-ID.
@@ -138,19 +160,19 @@ EOF;
       </dataset>
     </get>
   </site>
-</packet>     
+</packet>
 EOF;
 
     $response = CRM_Plesklists_Helper::pleskApi($request);
     $data = new SimpleXMLElement($response);
     return CRM_Utils_Array::first((array)($data->site->get->result->id));
   }
-  
+
   /**
    * Handles the response of a get-list action on the Plesk API.
-   * 
+   *
    * @param type $response
-   * 
+   *
    * @return array
    *    an array containing the plesk list entities that our
    *    custom API returns.
