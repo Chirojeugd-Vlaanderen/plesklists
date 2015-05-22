@@ -171,7 +171,7 @@ EOF;
       if (isset($list_groups[$name])) {
         $list_array["group_id"] = $list_groups[$name];
       }
-      $result[] = $list_array;
+      $result[$id] = $list_array;
     }
     return $result;
   }
@@ -198,7 +198,7 @@ EOF;
     $filters = array_intersect_key($params, $list_keys);
 
     $result = array();
-    foreach ($lists as $list) {
+    foreach ($lists as $list_id => $list) {
       $ok = TRUE;
       foreach ($filters as $key => $value) {
         // At the moment we only support filters of the form
@@ -209,7 +209,7 @@ EOF;
         }
       }
       if ($ok) {
-        $result[] = $list;
+        $result[$list_id] = $list;
       }
     }
 
