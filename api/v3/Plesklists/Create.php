@@ -34,15 +34,10 @@ function civicrm_api3_plesklists_Create($params) {
   
   if ($result["count"] == 0) {
     // Create new list.
-    $id = CRM_Plesklists_Helper::createList(
+    $result_value = CRM_Plesklists_Helper::getInstance()->createList(
         $params['name'],
         $params['admin_email'],
-        $params['password']);    
-
-    $result_value = array(
-      'id' => $id,
-      'name' => $params['name'],
-    );
+        $params['password']);
   }
   else {
     $result_value = CRM_Utils_Array::first($result["values"]);

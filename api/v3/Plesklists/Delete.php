@@ -32,7 +32,7 @@ function civicrm_api3_plesklists_Delete($params) {
         "$custom_field_name" => '',
       ));            
     }
-    CRM_Plesklists_Helper::deleteList($plesk_list['name']);
+    CRM_Plesklists_Helper::getInstance()->deleteList($plesk_list['name']);
   }
   
   return civicrm_api3_create_success(1, $params, 'Plesklists', 'delete');

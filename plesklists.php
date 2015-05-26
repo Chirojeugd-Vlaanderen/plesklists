@@ -177,7 +177,7 @@ function _plesklists_civicrm_validateListName($list_name, $group_id) {
       return NULL;
     }
 
-    if (!CRM_Plesklists_Helper::isValidListName($list_name)) {
+    if (!CRM_Plesklists_Helper::getInstance()->isValidListName($list_name)) {
       return ts('Invalid mailing list name.');
     }
 
