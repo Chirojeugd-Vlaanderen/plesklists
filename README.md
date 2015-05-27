@@ -29,17 +29,41 @@ a mailing list in that custom field.
 Invoking the `sync` action of the `plesklists` API replaces all e-mail
 addresses of all plesk mailing lists that have a corresponding group in
 CiviCRM by the e-mail addresses of the contacts in the group. (Excluding
-the contacts that have `is_opt_out` set). If you use drush, you might
-need the -u 1 option.
+the contacts that have `is_opt_out` set). If you use drush, you will
+probably need the -u 1 option.
 
     drush -u 1 cvapi Plesklists.sync
 
 You could create a scheduled task that performs this action on a regular base.
+
+## API
+
+Some API examples using drush:
+
+    # return the mailing list that is linked to CiviCRM group with group_id 5.
+    drush cvapi -u 1 Plesklists.get group_id=5
+    
+    # create a new mailing list, and link it to group with group_id 2.
+    drush -u 1 cvapi Plesklists.create name=another_test \
+      admin_email='helpdesk@chiro.be' password='some_pw' group_id=2
+    
+    # delete the mailing list with id=13.
+    # (you need to provide an id if you delete objects with the CiviCRM API.)
+    drush cvapi -u 1 Plesklists.delete id=13
+    
+    # update all e-mail adresses of all groups.
+    drush cvapi -u 1 Plesklists.sync
+
+Remarks:
+
+* Chained calls are supported. That's not because I implemented this, this is
+  thanks to how the CiviCRM API is built.
+* You cannot update the e-mail address of a one particular group ATM. See #4.
 
 ## Known problems
 
 If you are running plesk 11.5, you might need to configure the extension
 [with the admin credentials of your plesk server](http://kb.odin.com/en/120154).
 
-And please be aware that this is alpha software, with a lot of bugs and
+And please be aware that this is beta software, with a lot of bugs and
 issues. We invite you to report them on the issue tracker.
