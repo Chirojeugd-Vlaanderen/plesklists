@@ -6,7 +6,7 @@
   with plesk mailing lists.</description>
   <license>AGPL-3.0</license>
   <maintainer>
-    <author>Chirojeugd-Vlaanderen vzw</author>
+    <author>Johan Vervloet</author>
     <email>helpdesk@chiro.be</email>
   </maintainer>
   <urls>
@@ -21,7 +21,7 @@
     <ver>4.5</ver>
   </compatibility>
   <comments>
-	  Contact: johan.vervloet@chiro.be, tim.mallezie@chiro.be
+	  Developed by Chirojeugd-Vlaanderen vzw (https://www.chiro.be)
   </comments>
   <civix>
     <namespace>CRM/Plesklists</namespace>
