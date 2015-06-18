@@ -44,10 +44,13 @@ class CRM_Plesklists_Form_PleskSettings extends CRM_Core_Form {
     parent::postProcess();
     $vals = $this->controller->exportValues($this->_name);
 
-    // Store form values in CiviCRM settings.
-    CRM_Core_BAO_Setting::setItem($vals['plesk_host'], 'plesklists', 'plesklist_host');
-    CRM_Core_BAO_Setting::setItem($vals['plesk_login'], 'plesklists', 'plesklist_login');
-    CRM_Core_BAO_Setting::setItem($vals['plesk_password'], 'plesklists', 'plesklist_password');
+    // Configure plesklists using the API.
+    civicrm_api3('Plesklists', 'configure', array(
+      'sequential' => 1,
+      'host' => $vals['plesk_host'],
+      'login' => $vals['plesk_login'],
+      'password' => $vals['plesk_password'],
+    ));
   }
 
   /**
