@@ -57,9 +57,16 @@ class CRM_Plesklists_Client {
    * Perform API request
    *
    * @param string $request
-   * @return string
+   * @return SimpleXMLElement the parsed result
+   * @throws Exception
+   * 
+   * If the client is not configured, or if the result contains an error
+   * message, an exception is thrown.
    */
   public function request($request) {
+    if (empty($this->_login) || empty($this->_host) || empty($this->_password)) {
+      throw new Exception('Access to the Plesk list server is not configured.');
+    }
     $curl = curl_init();
 
     curl_setopt($curl, CURLOPT_URL, "$this->_protocol://$this->_host:$this->_port/enterprise/control/agent.php");
@@ -71,10 +78,17 @@ class CRM_Plesklists_Client {
     curl_setopt($curl, CURLOPT_POSTFIELDS, $request);
 
     $result = curl_exec($curl);
-
     curl_close($curl);
 
-    return $result;
+    if ($result === FALSE) {
+      throw new Exception("No reply from Plesk API.");
+    }
+    $data = new SimpleXMLElement($result);
+    if ($data->system->status == 'error') {
+      throw new Exception($data->system->errtext);
+    }
+
+    return $data;
   }
 
   /**

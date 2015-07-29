@@ -6,6 +6,7 @@
  * TODO: This class needs some refactoring.
  */
 class CRM_Plesklists_Helper {
+
   private static $instance;
   private $list_access;
 
@@ -15,10 +16,8 @@ class CRM_Plesklists_Helper {
     $this->list_access = new CRM_Plesklists_ListAccess();
   }
 
-  public static function getInstance()
-  {
-    if ( is_null( self::$instance ) )
-    {
+  public static function getInstance() {
+    if (is_null(self::$instance)) {
       self::$instance = new self();
     }
     return self::$instance;
@@ -105,7 +104,7 @@ class CRM_Plesklists_Helper {
    */
   public function isValidListName($name) {
     // Just guessing the format of a mailman list name.
-    $pattern='/^[A-Za-z0-9._%+-]+$/';
+    $pattern = '/^[A-Za-z0-9._%+-]+$/';
 
     return preg_match($pattern, $name);
   }
@@ -135,13 +134,11 @@ class CRM_Plesklists_Helper {
 
     return $result;
   }
-
-
+  
   // The functions below are more or less proxies to the list_access
   // object. This is intended. By providing another list_access, we could
   // (at some point in the future) use this module for accessing other
   // systems, like e.g. the mailman 3 API.
-
 
   /**
    * Returns an array containing all lists on the plesk server, with their
@@ -211,7 +208,10 @@ class CRM_Plesklists_Helper {
    * @param string $list_name
    * @param array $emails
    */
-  public function addListEmails($list_name,$emails) {
+  public function addListEmails($list_name, $emails) {
+    if (count($emails) == 0) {
+      return;
+    }
     // prevent script injection:
     $clean_list_name = htmlspecialchars($list_name);
     $clean_emails = array();
@@ -230,7 +230,10 @@ class CRM_Plesklists_Helper {
    * @param string $list_name
    * @param array $emails
    */
-  public function removeListEmails($list_name,$emails) {
+  public function removeListEmails($list_name, $emails) {
+    if (count($emails) == 0) {
+      return;
+    }    
     // prevent script injection:
     $clean_list_name = htmlspecialchars($list_name);
     $clean_emails = array();

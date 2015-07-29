@@ -8,7 +8,11 @@ class CRM_Plesklists_ListAccess {
    * Calls the plesk api.
    *
    * @param string $request xml-request to send to the api.
-   * @returns the API result as string.
+   * @returns SimpleXMLElement the parsed API result.
+   * @throws Exception
+   * 
+   * If the client is not properly configured, or if the API returns an
+   * error, an exception will be thrown.
    */
   private function pleskApi($request) {
     $host = CRM_Core_BAO_Setting::getItem('plesklists', 'plesklist_host');
@@ -18,7 +22,6 @@ class CRM_Plesklists_ListAccess {
     $client = new CRM_Plesklists_Client($host);
     $client->setCredentials($login, $password);
 
-    // TODO: Error handling.
     return $client->request($request);
   }
 
@@ -39,7 +42,7 @@ class CRM_Plesklists_ListAccess {
 </packet>
 EOF;
 
-    $data = new SimpleXMLElement($this->pleskApi($request));
+    $data = $this->pleskApi($request);
     $result = array();
 
     // I suspect that there are better ways to parse the response...
@@ -77,8 +80,7 @@ EOF;
 </packet>
 EOF;
 
-    $response = $this->pleskApi($request);
-    $data = new SimpleXMLElement($response);
+    $data = $this->pleskApi($request);
     return CRM_Utils_Array::first((array)($data->site->get->result->id));
   }
 
@@ -114,8 +116,7 @@ EOF;
 </packet>
 EOF;
 
-    $response = $this->pleskApi($request);
-    $data = new SimpleXMLElement($response);
+    $data = $this->pleskApi($request);
     return CRM_Utils_Array::first((array)($data->maillist->{'add-list'}->result->id));
   }
 
@@ -160,9 +161,7 @@ EOF;
 </packet>
 EOF;
 
-    $response = $this->pleskApi($request);
-
-    $data = new SimpleXMLElement($response);
+    $data = $this->pleskApi($request);
     $result = (array)($data->maillist->{'get-members'}->result->id);
     return $result;
   }

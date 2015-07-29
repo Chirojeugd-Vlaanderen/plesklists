@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Plesklists.Create API
  *

@@ -180,8 +180,16 @@ function _plesklists_civicrm_validateListName($list_name, $group_id) {
     if (!CRM_Plesklists_Helper::getInstance()->isValidListName($list_name)) {
       return ts('Invalid mailing list name.');
     }
+    try {
+      $result = civicrm_api3('Plesklists', 'get', array('name' => $list_name));
+    }
+    catch (Exception $e) {
+      return $e->getMessage();
+    }
 
-    $result = civicrm_api3('Plesklists', 'get', array('name' => $list_name));
+    if (!empty($result['is_error'])) {
+      return $result['error_message'];
+    }   
     if ($result['count'] == 0) {
       return ts(
           'List %1 does not exist on Plesk server.', array(1 => $list_name));
