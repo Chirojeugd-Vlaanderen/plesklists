@@ -54,6 +54,9 @@ Some API examples using drush:
     # update all e-mail adresses of all groups.
     drush cvapi -u 1 Plesklists.sync
 
+    # update e-mail addresses of mailing list with given name.
+    drush cvapi -u 1 Plesklists.sync name=another_test
+
 Remarks:
 
 * Chained calls are supported. That's not because I implemented this, this is

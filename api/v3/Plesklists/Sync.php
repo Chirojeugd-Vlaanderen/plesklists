@@ -10,9 +10,25 @@
  * @throws API_Exception
  */
 function civicrm_api3_plesklists_sync($params) {
-  $all_lists = CRM_Plesklists_Helper::getInstance()->getListGroups();
+  // Use API to get the lists, then sync all returned lists.
+  // The Plesklists API ignores 'return' at the moment, but let's
+  // now it is there if someone adds return support in the future.
+  $params['return'] = 'group_id,name';
+  $get_result = civicrm_api3('Plesklists', 'get', $params);
+  if ($get_result[is_error] > 0) {
+    return $get_result;
+  }
 
-  foreach ($all_lists as $group_id => $list_name) {
+  foreach ($get_result['values'] as $list) {
+    // $group_id can be null for lists on the server that are not connected
+    // to a CiviCRM group. Those lists can be ignored.
+    if (!isset($list['group_id'])) {
+      contiue;
+    }
+
+    $group_id = $list['group_id'];
+    $list_name = $list['name'];
+
     $list_members = CRM_Plesklists_Helper::getInstance()->getListEmails($list_name);
     $group_members = CRM_Plesklists_Helper::getInstance()->getGroupEmails($group_id);
     // array_filter removes the empty e-mail addresses (of people without
@@ -25,4 +41,3 @@ function civicrm_api3_plesklists_sync($params) {
 
   return civicrm_api3_create_success(1, $params, "Plesklists", "sync");
 }
-
