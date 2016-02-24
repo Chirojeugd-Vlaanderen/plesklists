@@ -9,6 +9,12 @@ in sync with CiviCRM group members. It should work for both
 The extension only synchronizes e-mail adresses of contacts that don't
 have `is_opt_out` set.
 
+## Changelog
+
+Version 0.1-beta5 fixes #19. If you have lists on your server that are
+not connected to a CiviCRM group, the extension now leaves them alone,
+as it should.
+
 ## Configuration
 
 After enabling the extension, you can configure it via the form on
@@ -70,3 +76,4 @@ If you are running plesk 11.5, you might need to configure the extension
 
 And please be aware that this is beta software, with a lot of bugs and
 issues. We invite you to report them on the issue tracker.
+
