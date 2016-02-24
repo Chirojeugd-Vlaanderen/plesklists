@@ -23,7 +23,7 @@ function civicrm_api3_plesklists_sync($params) {
     // $group_id can be null for lists on the server that are not connected
     // to a CiviCRM group. Those lists can be ignored.
     if (!isset($list['group_id'])) {
-      contiue;
+      continue;
     }
 
     $group_id = $list['group_id'];
