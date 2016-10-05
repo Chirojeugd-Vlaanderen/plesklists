@@ -4,6 +4,7 @@
  * Singleton class with helper methods for the plesklists extension.
  *
  * TODO: This class needs some refactoring.
+ * TODO: I have no clue why I made this a singleton.
  */
 class CRM_Plesklists_Helper {
 

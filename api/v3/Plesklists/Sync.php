@@ -12,7 +12,7 @@
 function civicrm_api3_plesklists_sync($params) {
   // Use API to get the lists, then sync all returned lists.
   // The Plesklists API ignores 'return' at the moment, but let's
-  // now it is there if someone adds return support in the future.
+  // assume it is there. Maybe someone adds it in the future.
   $params['return'] = 'group_id,name';
   $get_result = civicrm_api3('Plesklists', 'get', $params);
   if ($get_result[is_error] > 0) {
